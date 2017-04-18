@@ -10,9 +10,7 @@
 //Declaro las funciones que voy a usar
 void llenar(int *red, float prob, int n);
 void imprimir(int *red, int n);
-void escribir(float z,float a);
-float valor_medio(float z,int n);
-float dispersion(float z,float x,int n);
+void escribir(double z,double a);
 int   hoshen(int *red,int n);
 int   actualizar(int *red,int *clase,int s,int frag);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2);
@@ -24,7 +22,8 @@ int   percola(int *red,int n);
 int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de cada argumento
 {
   int    i,j,*red,n,z;
-  float  prob,denominador,media,desviacion,prob_acum,prob_cuadr_acum;
+  float  prob,denominador,media,desviacion;
+  double prob_acum,prob_cuadr_acum,sigma;
 
   srand(time(NULL));
   n=N;
@@ -64,14 +63,13 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
           if (percola(red,n)) prob+=(-1.0/denominador); 
           else prob+=(1.0/denominador);     
 	}
-	prob_acum=prob_acum+prob;
-	prob_cuadr_acum=prob_cuadr_acum+prob*prob;
+	prob_acum=prob_acum+(double)prob/(double)z;
+	prob_cuadr_acum=prob_cuadr_acum+(double)prob*(double)prob/(double)z;
+	//printf("%g\t%g\n",prob_acum,prob_cuadr_acum);
   }
 //  printf("\n\nEl valor de pc para un red cuadrada de lado %i es: %f\n",n,prob); //imprimo el valor de la probabilidad crítica
-  media=valor_medio(prob_acum,z);
-  desviacion=dispersion(prob_acum,prob_cuadr_acum,z);
-  escribir(media,desviacion);
-
+  sigma=sqrt(prob_cuadr_acum-prob_acum*prob_acum);
+  escribir(prob_acum,sigma);
 
   //imprimir(red,n);	
   free(red);
@@ -81,26 +79,6 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 
 
 //Subfunciones
-
-
-float valor_medio(float z,int n)
-{
-	float m;
-	m=(float)z/n;
-	return m;
-}
-
-
-float dispersion(float z, float x,int n)
-{
-	float m,d,k;
-	m=(float)z/n; //media de p
-	d=(float)x/n; //media de p cuadrado
-	k=d-m*m;
-	return k;
-}
-
-
 
 
 int hoshen(int *red,int n)
@@ -340,11 +318,11 @@ void imprimir(int *red, int n)
 }
 
 
-void escribir(float z, float a)
+void escribir(double z, double a)
 {
 
 	FILE *fp;
 	fp=fopen("perco_bi.txt","a");
-	fprintf(fp,"%f %f\n",z,a);
+	fprintf(fp,"%g %g\n",z,a);
 	fclose(fp);
 }
