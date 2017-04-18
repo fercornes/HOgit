@@ -10,7 +10,9 @@
 //Declaro las funciones que voy a usar
 void llenar(int *red, float prob, int n);
 void imprimir(int *red, int n);
-void escribir(float *z,int n);
+void escribir(float z,float a);
+float valor_medio(float z,int n);
+float dispersion(float z,float x,int n);
 int   hoshen(int *red,int n);
 int   actualizar(int *red,int *clase,int s,int frag);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2);
@@ -22,11 +24,14 @@ int   percola(int *red,int n);
 int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de cada argumento
 {
   int    i,j,*red,n,z;
-  float  prob,denominador;
+  float  prob,denominador,media,desviacion,prob_acum,prob_cuadr_acum;
 
   srand(time(NULL));
   n=N;
   z=Z;
+
+  prob_acum=0.0;
+  prob_cuadr_acum=0.0;
 
   if (argc==3) 
      {
@@ -36,9 +41,6 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
     
   red=(int *)malloc(n*n*sizeof(int));
    
-  float vector_prob[z];
-
-  
   for(i=0;i<z;i++) //hago z iteraciones, es decir me "muevo" a través de la red infinita
   {
   
@@ -62,11 +64,13 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
           if (percola(red,n)) prob+=(-1.0/denominador); 
           else prob+=(1.0/denominador);     
 	}
-
-      vector_prob[i]=prob;   
+	prob_acum=prob_acum+prob;
+	prob_cuadr_acum=prob_cuadr_acum+prob*prob;
   }
 //  printf("\n\nEl valor de pc para un red cuadrada de lado %i es: %f\n",n,prob); //imprimo el valor de la probabilidad crítica
-  escribir(vector_prob,z);
+  media=valor_medio(prob_acum,z);
+  desviacion=dispersion(prob_acum,prob_cuadr_acum,z);
+  escribir(media,desviacion);
 
 
   //imprimir(red,n);	
@@ -77,6 +81,27 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 
 
 //Subfunciones
+
+
+float valor_medio(float z,int n)
+{
+	float m;
+	m=(float)z/n;
+	return m;
+}
+
+
+float dispersion(float z, float x,int n)
+{
+	float m,d,k;
+	m=(float)z/n; //media de p
+	d=(float)x/n; //media de p cuadrado
+	k=d-m*m;
+	return k;
+}
+
+
+
 
 int hoshen(int *red,int n)
 {
@@ -174,20 +199,22 @@ Primera fila: Me paro en una ubicacion.
 
 int   actualizar(int *red,int *clase,int s,int frag)
 {
-	//solamente entra si es distinto de cero el valor actual
-	if (s==0) //el anterior es cero o el de arriba (segun si estoy al inicio de una fila)
-	{ 
+	while(clase[s]<0) //hallo la etiqueta verdadera
+	{
+		s=-clase[s]; 
+	}	
+	if(s!=0) //el anterior o el de arriba es distinto de cero
+	{
+		*red=clase[s];
+		clase[s]=s;
+	}
+	else
+	{
 		*red=frag;
 		clase[frag]=frag;
 		frag++;
-	}
-	else	//el anterior o el de arriba es distinto de cero
-	{
-		while (clase[s]<0) s=-clase[s]; //hallo la etiqueta verdadera
-		*red=s; //se la asigno a la red
-		clase[s]=s;
 	}	
-
+	
 return frag; //devuelve el valor de frag. 
 }
 
@@ -195,10 +222,21 @@ return frag; //devuelve el valor de frag.
 //etiqueta_falsa(red+i+j,clase,s1,s2);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2)
 {
-	while (clase[s1]<0) s1=-clase[s1];//me muevo hasta que encuentro el verdadero valor de s1 (el menos lo coloco porque el argumento de clase es positivo)
-	while (clase[s2]<0) s2=-clase[s2];//me muevo hasta que encuentro el verdadero valor de s2
+	while (clase[s1]<0) 
+	{
+		s1=-clase[s1];//me muevo hasta que encuentro el verdadero valor de s1 (el menos lo coloco porque el argumento de clase es positivo)
+	}
+	while (clase[s2]<0) 
+	{
+		s2=-clase[s2];//me muevo hasta que encuentro el verdadero valor de s2
+	}
 
 //en este momento, ya encontré el verdadero valor de s1 ó s2
+	if(s1==s2)
+	{
+		*red=s1;
+		clase[s1]=s1;	
+	}
 
 	if (s2<s1) 
 	{
@@ -210,7 +248,7 @@ void  etiqueta_falsa(int *red,int *clase,int s1,int s2)
 		     	5 1, 
 entoces coloco -3 en la posición 5 del vector de clases y al 1 le pongo -3; Quizás el 3 sea falso, es decir que clase[3] sea negativo. Si es así, es que proviene de otro valor. Debo seguir el "caminito" hasta llegar al verdadero valor de s2
 */
-	else
+	if (s1<s2)
 	{
 		clase[s2]=-s1;
 		clase[s1]=s1;
@@ -226,9 +264,12 @@ void  corregir_etiqueta(int *red,int *clase,int n)
 	int i,s;
 	for (i=0; i<n*n;i++)
 	{
-		s=red[i];
-		while(clase[s]<0) s=-clase[s];
-		red[i]=s;	
+		s=*(red+i);
+		while(clase[s]<0)
+		{
+			s=-clase[s];
+			*(red+i)=s;
+		}
 	} 
 }
 
@@ -299,15 +340,11 @@ void imprimir(int *red, int n)
 }
 
 
-void escribir(float *z,int n)
+void escribir(float z, float a)
 {
 
-	int i;
 	FILE *fp;
 	fp=fopen("perco_bi.txt","a");
-	for (i=0;i<n;i++)
-	{
-		fprintf(fp,"%f\n",*(z+i));
-	}
+	fprintf(fp,"%f %f\n",z,a);
 	fclose(fp);
 }
