@@ -11,7 +11,8 @@
 //Declaro las funciones que voy a usar
 void llenar(int *red, float prob, int n);
 void imprimir(int *red, int n);
-void escribir(float *za,int n);
+void escribir(double z);
+double mediana(int *z, int bins, int iter);
 int   hoshen(int *red,int n);
 int   actualizar(int *red,int *clase,int s,int frag);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2);
@@ -23,6 +24,8 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 {
   int    i,*red,n,z,bin,c,l;
   float  prob;
+  double med;
+ 
 
   srand(time(NULL));
   n=N;
@@ -37,13 +40,14 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
   red=(int *)malloc(n*n*sizeof(int));
    
   l=500;
-  float vector_histo[l];	
+  int vector_histo[l];	
 	for (bin=0;bin<l;bin++) //me moy moviendo en las prob con un paso dado por bin
 	{
 		c=0;
-		prob=(float)bin/l;
-
-  		for(i=0;i<z;i++) //hago z iteraciones, es decir me "muevo" a través de la red infinita
+		prob=((float)bin*0.2/(float)l)+0.45;
+		//prob=(float)bin/l;	
+		
+		for(i=0;i<z;i++) //hago z iteraciones, es decir me "muevo" a través de la red infinita
   		{
       			llenar(red,prob,n); //lleno la matriz      
           		hoshen(red,n);      //transformo la matriz
@@ -54,7 +58,9 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 		}
   		vector_histo[bin]=c;
 	}
-  escribir(vector_histo,l);
+  //printf("%i",vector_histo[300]);
+  med=mediana(vector_histo,l,z);
+  escribir(med);
   free(red);
 
   return 0;
@@ -64,6 +70,27 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 
 
 //Subfunciones
+
+double mediana(int *z, int bins, int iter)
+{
+	int i,med,d;
+	double e;
+	d=10000;
+	e=0.0;
+	for (i=0; i<bins; i++)
+	{
+		med=z[i]-iter/2; //distancia a iter/2 (centro)
+		//printf("%i\t%i\n",med,z[i]);
+		if (med<0) med=-med;	 //modulo
+		if (med<d)
+		{ 
+			d=med;
+			e=((double)i*0.2/(double)bins)+0.45;
+			//e=(double)i/(double)bins;
+		}
+	}
+return e;
+}
 
 int hoshen(int *red,int n)
 {
@@ -161,20 +188,22 @@ Primera fila: Me paro en una ubicacion.
 
 int   actualizar(int *red,int *clase,int s,int frag)
 {
-	//solamente entra si es distinto de cero el valor actual
-	if (s==0) //el anterior es cero o el de arriba (segun si estoy al inicio de una fila)
-	{ 
+	while(clase[s]<0) //hallo la etiqueta verdadera
+	{
+		s=-clase[s]; 
+	}	
+	if(s!=0) //el anterior o el de arriba es distinto de cero
+	{
+		*red=clase[s];
+		clase[s]=s;
+	}
+	else
+	{
 		*red=frag;
 		clase[frag]=frag;
 		frag++;
-	}
-	else	//el anterior o el de arriba es distinto de cero
-	{
-		while (clase[s]<0) s=-clase[s]; //hallo la etiqueta verdadera
-		*red=s; //se la asigno a la red
-		clase[s]=s;
 	}	
-
+	
 return frag; //devuelve el valor de frag. 
 }
 
@@ -182,10 +211,21 @@ return frag; //devuelve el valor de frag.
 //etiqueta_falsa(red+i+j,clase,s1,s2);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2)
 {
-	while (clase[s1]<0) s1=-clase[s1];//me muevo hasta que encuentro el verdadero valor de s1 (el menos lo coloco porque el argumento de clase es positivo)
-	while (clase[s2]<0) s2=-clase[s2];//me muevo hasta que encuentro el verdadero valor de s2
+	while (clase[s1]<0) 
+	{
+		s1=-clase[s1];//me muevo hasta que encuentro el verdadero valor de s1 (el menos lo coloco porque el argumento de clase es positivo)
+	}
+	while (clase[s2]<0) 
+	{
+		s2=-clase[s2];//me muevo hasta que encuentro el verdadero valor de s2
+	}
 
 //en este momento, ya encontré el verdadero valor de s1 ó s2
+	if(s1==s2)
+	{
+		*red=s1;
+		clase[s1]=s1;	
+	}
 
 	if (s2<s1) 
 	{
@@ -197,7 +237,7 @@ void  etiqueta_falsa(int *red,int *clase,int s1,int s2)
 		     	5 1, 
 entoces coloco -3 en la posición 5 del vector de clases y al 1 le pongo -3; Quizás el 3 sea falso, es decir que clase[3] sea negativo. Si es así, es que proviene de otro valor. Debo seguir el "caminito" hasta llegar al verdadero valor de s2
 */
-	else
+	if (s1<s2)
 	{
 		clase[s2]=-s1;
 		clase[s1]=s1;
@@ -213,11 +253,15 @@ void  corregir_etiqueta(int *red,int *clase,int n)
 	int i,s;
 	for (i=0; i<n*n;i++)
 	{
-		s=red[i];
-		while(clase[s]<0) s=-clase[s];
-		red[i]=s;	
+		s=*(red+i);
+		while(clase[s]<0)
+		{
+			s=-clase[s];
+			*(red+i)=s;
+		}
 	} 
 }
+
 
 
 int   percola(int *red,int n)
@@ -287,16 +331,11 @@ void imprimir(int *red, int n)
 }
 
 
-void escribir(float *za,int n)
+void escribir(double z)
 {
-
-	int i;
 	FILE *fp;
 	fp=fopen("perco_histo.txt","a");
-	for (i=0;i<n;i++)
-	{
-		fprintf(fp,"%f\n",*(za+i));
-	}
+	fprintf(fp,"%g\n",z);
 	fclose(fp);
 }	
 

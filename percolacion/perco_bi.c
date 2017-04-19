@@ -11,6 +11,8 @@
 void llenar(int *red, float prob, int n);
 void imprimir(int *red, int n);
 void escribir(double z,double a);
+double valor_medio(double z,int n);
+double dispersion(double z,double x,int n);
 int   hoshen(int *red,int n);
 int   actualizar(int *red,int *clase,int s,int frag);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2);
@@ -23,7 +25,7 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 {
   int    i,j,*red,n,z;
   float  prob,denominador,media,desviacion;
-  double prob_acum,prob_cuadr_acum,sigma;
+  double prob_acum,prob_cuadr_acum;
 
   srand(time(NULL));
   n=N;
@@ -63,13 +65,14 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
           if (percola(red,n)) prob+=(-1.0/denominador); 
           else prob+=(1.0/denominador);     
 	}
-	prob_acum=prob_acum+(double)prob/(double)z;
-	prob_cuadr_acum=prob_cuadr_acum+(double)prob*(double)prob/(double)z;
-	//printf("%g\t%g\n",prob_acum,prob_cuadr_acum);
+	prob_acum=prob_acum+(double)prob;
+	prob_cuadr_acum=prob_cuadr_acum+(double)prob*(double)prob;
   }
 //  printf("\n\nEl valor de pc para un red cuadrada de lado %i es: %f\n",n,prob); //imprimo el valor de la probabilidad crítica
-  sigma=sqrt(prob_cuadr_acum-prob_acum*prob_acum);
-  escribir(prob_acum,sigma);
+  media=valor_medio(prob_acum,z);
+  desviacion=dispersion(prob_acum,prob_cuadr_acum,z);
+  escribir(media,desviacion);
+
 
   //imprimir(red,n);	
   free(red);
@@ -79,6 +82,26 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 
 
 //Subfunciones
+
+
+double valor_medio(double z,int n)
+{
+	double m;
+	m=(double)z/n;
+	return m;
+}
+
+
+double dispersion(double z, double x,int n)
+{
+	double m,d,k;
+	m=z/(double)n; //media de p
+	d=x/(double)n; //media de p cuadrado
+	k=sqrt(d-m*m);
+	return k;
+}
+
+
 
 
 int hoshen(int *red,int n)
