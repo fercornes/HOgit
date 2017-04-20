@@ -38,8 +38,8 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
   red=(int *)malloc(n*n*sizeof(int));
   ns_acum=(int *)malloc(n*n*sizeof(int));
    
-  //l=500;
-  l=1;
+  l=500;
+  //l=1;
   	
 	for (bin=0;bin<l;bin++) //me moy moviendo en las prob con un paso dado por bin
 	{
@@ -49,8 +49,8 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 			*(ns_acum+j)=0; //me voy moviendo de ubicación con *(ns_acum+j)
 		}
 
-		//prob=((float)bin*0.2/(float)l)+0.45;
-		prob=0.5927;		
+		prob=((float)bin*0.2/(float)l)+0.45;
+		//prob=0.5927;		
 	
 		for(i=0;i<z;i++) //hago z iteraciones, es decir me "muevo" a través de la red infinita
   		{
@@ -62,9 +62,10 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 			}
 		//for(ij=0;ij<n*n;ij++) printf("%i\t",ns_acum[ij]);
 		}
+	escribir(ns_acum,n,z);
  	}
   //printf("%i",vector_histo[300]);
-  escribir(ns_acum,n,z);
+  
   //imprimir(red,n);
   free(red);
   free(ns_acum);
@@ -353,12 +354,14 @@ void imprimir(int *red, int n)
 void escribir(int *z, int n, int iter)
 {
 	int i;
+	double suma;
+	suma=0.0;
 	FILE *fp;
-	fp=fopen("perco_ns.txt","a");
-	for(i=0;i<n*n/2;i++)
-	{
-		fprintf(fp,"%g\n",(double)*(z+i)/(iter*n*n));
-	}	
+	fp=fopen("perco_ns_m2.txt","a");
+	for(i=0;i<n*n;i++) suma=suma+i*i*(double)*(z+i)/(iter*n*n);
+
+	fprintf(fp,"%g\n",suma);
+	
 	fclose(fp);
 }	
 
