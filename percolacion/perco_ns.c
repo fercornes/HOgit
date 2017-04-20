@@ -11,18 +11,18 @@
 //Declaro las funciones que voy a usar
 void llenar(int *red, float prob, int n);
 void imprimir(int *red, int n);
-void escribir(int *z,int n, int *ns_vect_rep);
+void escribir(int *z,int n, int iter);
 int   hoshen(int *red,int n);
 int   actualizar(int *red,int *clase,int s,int frag);
 void  etiqueta_falsa(int *red,int *clase,int s1,int s2);
 void  corregir_etiqueta(int *red,int *clase,int n);
 int   percola(int *red,int n);
-int   ns(int *red,int n, int *ns_vector, int *ns_vect_rep);
+int   ns(int *red,int n, int *ns_vector);
 
 //Función principal
 int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de cada argumento
 {
-  int    i,*red,n,z,bin,l,*ns_acum,j,*ns_rep,ij;
+  int    i,*red,n,z,bin,l,*ns_acum,j;
   float  prob;
 
   srand(time(NULL));
@@ -37,7 +37,6 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
     
   red=(int *)malloc(n*n*sizeof(int));
   ns_acum=(int *)malloc(n*n*sizeof(int));
-  ns_rep=(int *)malloc(n*n*sizeof(int));
    
   //l=500;
   l=1;
@@ -48,7 +47,6 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 		for(j=0;j<n*n;j++) 
 		{
 			*(ns_acum+j)=0; //me voy moviendo de ubicación con *(ns_acum+j)
-			*(ns_rep+j)=0;
 		}
 
 		//prob=((float)bin*0.2/(float)l)+0.45;
@@ -60,17 +58,16 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
           		hoshen(red,n);      //transformo la matriz
 	  		if (percola(red,n)) 
 			{
-				ns(red,n,ns_acum,ns_rep);
+				ns(red,n,ns_acum);
 			}
 		//for(ij=0;ij<n*n;ij++) printf("%i\t",ns_acum[ij]);
 		}
  	}
   //printf("%i",vector_histo[300]);
-  escribir(ns_acum,n,ns_rep);
+  escribir(ns_acum,n,z);
   //imprimir(red,n);
   free(red);
   free(ns_acum);
-  free(ns_rep);
 
   return 0;
 
@@ -80,7 +77,7 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 
 //Subfunciones
 
-int   ns(int *red,int n, int *ns_vector, int *ns_vect_rep) //solamente funciona si la red percola. Calculo el ns por si tengo que trabajar con el cluster mas grande después del percolante
+int   ns(int *red,int n, int *ns_vector) //solamente funciona si la red percola. Calculo el ns por si tengo que trabajar con el cluster mas grande después del percolante
 {
 	int i,j,a,*ns_etiq;
 	ns_etiq=(int *)malloc(n*n*sizeof(int));
@@ -104,7 +101,6 @@ int   ns(int *red,int n, int *ns_vector, int *ns_vect_rep) //solamente funciona 
 				
 			}
 		}
-		if (a>0) *(ns_vect_rep+i)=*(ns_vect_rep+i)+1;
 		*(ns_vector+i)=*(ns_vector+i)+a; //por cada iteracion, quizas se repiten distintas veces, por eso luego saco un promedio de cuantas veces se repiten los clusters de un tamaño particular
 	}
 free(ns_etiq);		
@@ -354,16 +350,14 @@ void imprimir(int *red, int n)
 }
 
 
-void escribir(int *z, int n, int *ns_vect_rep)
+void escribir(int *z, int n, int iter)
 {
 	int i;
 	FILE *fp;
 	fp=fopen("perco_ns.txt","a");
 	for(i=0;i<n*n/2;i++)
 	{
-		if (*(ns_vect_rep+i)>0) fprintf(fp,"%g\t%i\n",(double)*(z+i)/(double)*(ns_vect_rep+i),*(ns_vect_rep+i));
-		else fprintf(fp,"%i\t%i\n",*(z+i),*(ns_vect_rep+i));
-		
+		fprintf(fp,"%g\n",(double)*(z+i)/iter);
 	}	
 	fclose(fp);
 }	
