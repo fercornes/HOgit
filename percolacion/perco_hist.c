@@ -4,7 +4,7 @@
 #include <time.h>
 
 #define P     16             // 1/2^P, P=16
-#define Z     30000          // iteraciones
+#define Z     30000          // numero de iteraciones
 #define N     30             // lado de la red simulada
 
 
