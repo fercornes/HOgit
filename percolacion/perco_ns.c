@@ -22,7 +22,7 @@ int   ns(int *red,int n, int *ns_vector, int *ns_vect_rep);
 //Función principal
 int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de cada argumento
 {
-  int    i,*red,n,z,bin,l,*ns_acum,j,*ns_rep;
+  int    i,*red,n,z,bin,l,*ns_acum,j,*ns_rep,ij;
   float  prob;
 
   srand(time(NULL));
@@ -52,7 +52,7 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 		}
 
 		//prob=((float)bin*0.2/(float)l)+0.45;
-		prob=0.6;		
+		prob=0.5927;		
 	
 		for(i=0;i<z;i++) //hago z iteraciones, es decir me "muevo" a través de la red infinita
   		{
@@ -62,11 +62,12 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
 			{
 				ns(red,n,ns_acum,ns_rep);
 			}
-		
+		//for(ij=0;ij<n*n;ij++) printf("%i\t",ns_acum[ij]);
 		}
  	}
   //printf("%i",vector_histo[300]);
   escribir(ns_acum,n,ns_rep);
+  //imprimir(red,n);
   free(red);
   free(ns_acum);
   free(ns_rep);
@@ -92,10 +93,10 @@ int   ns(int *red,int n, int *ns_vector, int *ns_vect_rep) //solamente funciona 
 		ns_etiq[red[i]]=ns_etiq[red[i]]+1; 
 	}
 	//for(i=0;i<n*n;i++) printf("%i\t",ns_etiq[i]);
-	for(i=2;i<n*n;i++) //fijo un valor de integrantes del cluster (argumentos de ns_etiq) y me fijo cuantos hay (los de tamaño 1 no me interesan por eso comienzo en i=2)
+	for(i=1;i<n*n;i++) //fijo un valor de integrantes del cluster (argumentos de ns_etiq) y me fijo cuantos hay
 	{
 		a=0;
-		for(j=2;j<n*n;j++) //Recorro el vector de etiquetas. Comienzo en j=2 porque j=0 son los vacios y j=1 no hay.
+		for(j=1;j<n*n;j++) //Recorro el vector de etiquetas. Comienzo en j=2 porque j=0 son los vacios y j=1 no hay.
 		{
 			if (ns_etiq[j]==i) //ej ns_etiq=[0 0 3 4 5 3 5 ...]
 			{
