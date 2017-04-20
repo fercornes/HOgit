@@ -58,8 +58,9 @@ int main(int argc,char *argv[]) //Via terminal le tengo que pasar el valor de ca
           		hoshen(red,n);      //transformo la matriz
 	  		if (percola(red,n)) 
 			{
-				ns(red,n,ns_acum);
+				//ns(red,n,ns_acum);
 			}
+		ns(red,n,ns_acum);
 		//for(ij=0;ij<n*n;ij++) printf("%i\t",ns_acum[ij]);
 		}
 	escribir(ns_acum,n,z);
