@@ -1,0 +1,15 @@
+Calculo el P desde 0.58 hasta 0.62 con un paso de 1/100 para L=64 y 256.
+
+Beta (teórico) = 0.138
+Sigma (teórico) = 0.3956
+Tau (teórico) = 2.055
+
+Para L=256 (R^2=0.99)
+Beta=Pendiente=0.51565 +\- 0.0030 ---> Beta=(Tau-2)/sigma ---> Tau=Sigma*Beta+2 ---> 2.203
+Ordenada=1.336 +\- 0.014 
+
+Para L=64 (R^2=0.99)
+Beta=Pendiente=0.4971 +\- 0.0034 ---> Beta=(Tau-2)/sigma ---> Tau=Sigma*Beta+2 ---> 2.196
+Ordenada=0.9117 +\- 0.013 
+
+Compilación: gcc nombre.c -O3 -o nombre.e -Wall 
