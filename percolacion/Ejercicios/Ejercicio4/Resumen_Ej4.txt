@@ -1,0 +1,3 @@
+Calculé la fz para L=64. El rango de p fue desde 0.4 hasta 0.7 con un paso de 1/100. Los s que usé para el gráfico se movieron en este intervalo (300,400). La pc fue 0.5926
+
+Compilación: gcc nombre.c -O3 -o nombre.e -Wall 
