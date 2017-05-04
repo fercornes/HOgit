@@ -1,0 +1,22 @@
+a) L desde 3 hasta 1023 con un paso de 3. 30000 iteraciones. El pc para L>... da ...
+
+b) L desde 2 hasta 370 con un paso de 1. 30000 iteraciones. Bins de 1/200 desde 0.45 hasta 0.65. 
+
+c) Usé los datos del item a). El pc(inf) da 0.5929 +\- 0.0001 y la pendiente -0.034 +\- 0.002. El valor de 1/nu que obtengo es -1.024 +\- 0.076 (pendiente) y la ordenada -1.29 +\- 0.26 (ojo estos son los datos del ajuste del grafico log-log). Por lo tanto, el valor de nu es 0.976 +\- ...
+
+d) Utilicé una red de 1024x1024 con 30000 iteraciones (no da bien). En cambio, con una de 256, el ajuste tiene un R^2 igual a 1. El valor de es pc=0.5928.
+-Tau=Pendiente=1.8891 +\- 0.0016
+Ordenada=-3.9188 +\- 0.0081 
+
+Pare esta red el tau que minimiza chi^2 es 1.89.
+
+Si L=64 entonces (con pc=0.5926 y R^2=0.99):
+-Tau=Pendiente=1.7137 +\- 0.0048
+Ordenada=-4.1526 +\- 0.0251 
+
+Pare esta red el tau que minimiza chi^2 es 1.71.
+
+Tau (teórico) = 2.055
+
+Compilación a,c,d: gcc nombre.c -O3 -o nombre.e -Wall 
+Compilación b: gcc nombre.c -O3 -o nombre.e -Wall -lm
