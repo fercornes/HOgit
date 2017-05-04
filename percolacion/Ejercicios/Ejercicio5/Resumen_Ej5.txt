@@ -1,0 +1,10 @@
+Calculé las probabilidades en donde se maximiza cada s con los datos del ejercicio 4. La red fue de 64x64. El pc de 0.5926. El intervalo de p fue (0.4,0.7) con un paso de 1/100. Los s los tomé desde 10 hasta 90 con un paso de 1. 
+
+Sigma = -Pendiente = 0.4942 +\- 0.011
+Ordenada = 0.016 +\- 0.042
+
+R^2 = 0.961
+
+Sigma (teórico) = 0.3956
+
+Compilación: gcc nombre.c -O3 -o nombre.e -Wall 
