@@ -1,0 +1,10 @@
+Calculo la masa del cluster percolante con L desde 5 hasta 1000 con un paso de 5. El pc es 0.5927. 
+
+Dimensión fractal = Pendiente = 1.841 +\- 0.001
+Ordenada = -4.007 +\- 0.009
+
+R^2 = 1
+
+Dimensión fractal (teórica) en pc = 1.895 
+
+Compilación: gcc nombre.c -O3 -o nombre.e -Wall 
